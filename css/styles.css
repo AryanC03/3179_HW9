@@ -1,0 +1,11 @@
+body {
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  margin: 0;
+  padding: 20px;
+  background: #f9f9f9;
+}
+
+#choropleth_map {
+  max-width: 1000px;
+  margin: 0 auto;
+}

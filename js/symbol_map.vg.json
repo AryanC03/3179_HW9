@@ -1,0 +1,83 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "width": 900,
+  "height": 600,
+  "title": "Major Disaster Events in Australia (size=fatalities, colour=type)",
+  "params": [
+    {
+      "name": "Zoom",
+      "value": 750,
+      "bind": {"input": "range", "min": 400, "max": 4000, "step": 50}
+    }
+  ],
+  "projection": {
+    "type": "mercator",
+    "center": [134, -27],
+    "scale": {"expr": "Zoom"}
+  },
+  "layer": [
+    {
+      "data": {"url": "data/ne_110m-2.json", "format": {"type": "topojson", "feature": "ne_110m_admin_0_countries"}},
+      "transform": [
+        {"filter": "datum.properties.ADMIN == 'Australia'"}
+      ],
+      "mark": {"type": "geoshape", "fill": "#f5f5f5", "stroke": "#cccccc"}
+    },
+    {
+      "data": {"url": "data/ne_110m-2.json", "format": {"type": "topojson", "feature": "ne_110m_graticules_1"}},
+      "mark": {"type": "geoshape", "stroke": "#e0e0e0", "strokeWidth": 0.5}
+    },
+    {
+      "data": {"url": "data/events.csv"},
+      "transform": [
+        {
+          "lookup": "Event",
+          "from": {
+            "data": {"url": "data/events_geocoded.csv"},
+            "key": "Event",
+            "fields": ["Region", "Zone", "latitude", "longitude"]
+          }
+        },
+        {
+          "calculate": "datum['Start Date'] && trim(datum['Start Date']) !== '' ? (timeParse(datum['Start Date'], '%Y-%m-%d %H:%M:%S') || timeParse(datum['Start Date'], '%d/%m/%Y') || timeParse(datum['Start Date'], '%-d/%-m/%Y') || timeParse(datum['Start Date'], '%-m/%-d/%Y')) : null",
+          "as": "StartDateParsed"
+        },
+        {
+          "calculate": "datum['End Date'] && trim(datum['End Date']) !== '' ? (timeParse(datum['End Date'], '%Y-%m-%d %H:%M:%S') || timeParse(datum['End Date'], '%d/%m/%Y') || timeParse(datum['End Date'], '%-d/%-m/%Y') || timeParse(datum['End Date'], '%-m/%-d/%Y')) : null",
+          "as": "EndDateParsed"
+        },
+        {
+          "calculate": "datum.StartDateParsed ? timeFormat(datum.StartDateParsed, '%d/%m/%Y') : null",
+          "as": "StartDateDisplay"
+        },
+        {
+          "calculate": "datum.EndDateParsed ? timeFormat(datum.EndDateParsed, '%d/%m/%Y') : null",
+          "as": "EndDateDisplay"
+        },
+        {"filter": "isValid(datum.latitude) && isValid(datum.longitude) && (isValid(datum.Fatalities) || isValid(datum['Insured Cost']))"}
+      ],
+      "mark": {"type": "circle", "opacity": 0.8, "tooltip": {"content": "data"}},
+      "encoding": {
+        "longitude": {"field": "longitude", "type": "quantitative"},
+        "latitude": {"field": "latitude", "type": "quantitative"},
+        "size": {
+          "field": "Fatalities", 
+          "type": "quantitative",
+          "title": "Fatalities",
+          "scale": {"range": [20, 120]}
+        },
+        "color": {"field": "Category", "type": "nominal", "title": "Disaster type"},
+        "tooltip": [
+          {"field": "Event", "type": "nominal"},
+          {"field": "Region", "type": "nominal"},
+          {"field": "Zone", "type": "nominal"},
+          {"field": "Category", "type": "nominal"},
+          {"field": "Fatalities", "type": "quantitative"},
+          {"field": "Insured Cost", "type": "quantitative"},
+          {"field": "StartDateDisplay", "type": "nominal", "title": "Start Date"},
+          {"field": "EndDateDisplay", "type": "nominal", "title": "End Date"}
+        ]
+      }
+    }
+  ]
+}
