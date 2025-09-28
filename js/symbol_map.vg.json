@@ -2,7 +2,7 @@
   "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
   "width": 900,
   "height": 600,
-  "title": "Major Disaster Events in Australia (size=fatalities, colour=type)",
+  "title": "Major Disaster Events in Australia",
   "params": [
     {
       "name": "Zoom",
