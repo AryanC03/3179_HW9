@@ -8,6 +8,33 @@
       "name": "Zoom",
       "value": 750,
       "bind": {"input": "range", "min": 400, "max": 4000, "step": 50}
+    },
+    {
+      "name": "DisasterType",
+      "value": "All",
+      "bind": {
+        "input": "select",
+        "options": [
+          "All",
+          "Bushfire",
+          "Criminal Act",
+          "Cyclone",
+          "Earthquake",
+          "Environment",
+          "Flood",
+          "Health",
+          "Industrial",
+          "Landslide",
+          "Maritime/Coastal",
+          "Other Disasters",
+          "Storm",
+          "Tornado",
+          "Transport",
+          "Tsunami",
+          "Urban Fire",
+          "flood"
+        ]
+      }
     }
   ],
   "projection": {
@@ -21,7 +48,7 @@
       "transform": [
         {"filter": "datum.properties.ADMIN == 'Australia'"}
       ],
-      "mark": {"type": "geoshape", "fill": "#f5f5f5", "stroke": "#cccccc"}
+      "mark": {"type": "geoshape", "fill": "#F5F5DC", "stroke": "#cccccc"}
     },
     {
       "data": {"url": "data/ne_110m-2.json", "format": {"type": "topojson", "feature": "ne_110m_graticules_1"}},
@@ -54,7 +81,8 @@
           "calculate": "datum.EndDateParsed ? timeFormat(datum.EndDateParsed, '%d/%m/%Y') : null",
           "as": "EndDateDisplay"
         },
-        {"filter": "isValid(datum.latitude) && isValid(datum.longitude) && (isValid(datum.Fatalities) || isValid(datum['Insured Cost']))"}
+        {"filter": "isValid(datum.latitude) && isValid(datum.longitude) && (isValid(datum.Fatalities) || isValid(datum['Insured Cost']))"},
+        {"filter": "DisasterType == 'All' || datum.Category == DisasterType"}
       ],
       "mark": {"type": "circle", "opacity": 0.8, "tooltip": {"content": "data"}},
       "encoding": {
